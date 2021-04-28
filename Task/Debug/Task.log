@@ -1,0 +1,3 @@
+﻿  main.cpp
+D:\Kuksenko\Mathematical_optimization\TaskSimplex\Task\Task\main.cpp(176,35): warning C4244: +=: преобразование "double" в "size_t", возможна потеря данных
+  Task.vcxproj -> D:\Kuksenko\Mathematical_optimization\TaskSimplex\Task\Debug\Task.exe
