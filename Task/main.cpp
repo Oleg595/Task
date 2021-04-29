@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <cmath>
 #include "Linear.h"
 #include "Simplex.h"
+#include "Task.h"
 
 bool next_combination(std::vector<size_t>& vec, size_t n) {
     size_t k = vec.size();
@@ -34,8 +36,8 @@ std::vector<std::vector<size_t>> combinations_of_cuts(std::vector<double> const&
     return all_combinations;
 }
 
-int number_of_cuts(double length, double cut_length) {
-    return (int)(length / cut_length);
+int number_of_cuts(double length, double cur_length) {
+    return (int)(length / cur_length);
 }
 
 void print(std::vector<int> const& combinations) {
@@ -127,19 +129,44 @@ double sum(std::vector<double> const& lengths, std::vector<size_t> const& number
     return sum;
 }
 
+int matrix_rank(Matrix& mat) {
+    size_t n = mat.get_n(), m = mat.get_m();
+    double EPS = 1E-5;
+    int rank = std::max(n, m);
+    std::vector<char> line_used(n);
+    for (size_t i = 0; i < m; ++i) {
+        size_t j;
+        for (j = 0; j < n; ++j)
+            if (!line_used[j] && abs(mat[j][i]) > EPS)
+                break;
+        if (j == n)
+            --rank;
+        else {
+            line_used[j] = true;
+            for (size_t p = i + 1; p < m; ++p)
+                mat[j][p] /= mat[j][i];
+            for (size_t k = 0; k < n; ++k)
+                if (k != j && abs(mat[k][i]) > EPS)
+                    for (size_t p = i + 1; p < m; ++p)
+                        mat[k][p] -= mat[j][p] * mat[k][i];
+        }
+    }
+    return rank;
+}
+
 int main() {
     std::vector<size_t> vector = { 1, 2 ,3, 4, 5, 6 };
-    std::vector<double> lenghts{ 0.60, 0.68, 0.83, 1.61, 1.67, 1.79, 2.80, 3.25, 3.25, 3.70, 3.95 };
+    std::vector<double> lengths{ 0.60, 0.68, 0.83, 1.61, 1.67, 1.79, 2.80, 3.25, 3.25, 3.70, 3.95 };
     //std::vector<size_t> numbers_of_products{ 249, 60, 97, 76, 72, 18, 43, 5424, 450, 515, 28 };
     std::vector<size_t> numbers_of_products{ 2 * 249, 2 * 60, 2 * 97, 2 * 76, 2 * 72, 2 * 18, 2 * 43, 2 * 5424, 2 * 450, 2 * 515, 2 * 28 };
     double constexpr L = 11.7;
-    std::cout << "All: " << sum(lenghts, numbers_of_products) << std::endl;
+    std::cout << "All: " << sum(lengths, numbers_of_products) << std::endl;
 
     // std::vector<double> lenghts{ 250, 200, 150 };
     // std::vector<size_t> numbers_of_products{ 249, 60, 97, 76, 72, 18, 43, 5424, 450, 515, 28 };
     // double constexpr L = 800;
 
-    std::vector<int> combinations(lenghts.size());
+    /*std::vector<int> combinations(lenghts.size());
 
     std::vector<int> first_comb(lenghts.size());
     all_combs.push_back(first_comb);
@@ -151,7 +178,7 @@ int main() {
         std::cout << std::endl;
     }*/
 
-    Limitations limitations = create_limitations(numbers_of_products);
+    /*Limitations limitations = create_limitations(numbers_of_products);
     std::vector<double> obj_func(limitations.limitations[0].first.size() - 1);
     for (auto& elem : obj_func) {
         elem = 1;
@@ -161,21 +188,33 @@ int main() {
         var_signs[i] = true;
     }
 
-    std::cout << "Counter))): " << all_combs.size() << std::endl;
+    std::cout << "Counter))): " << all_combs.size() - 1 << std::endl;
 
     Linear linear(obj_func, limitations, var_signs);
-    Simplex simplex(linear.get_matrix(), linear.get_b(), linear.get_obj_func(), TT::TT_MIN);
+    auto mat = linear.get_matrix();
+    auto obj = linear.get_obj_func();
+    auto b = linear.get_b();
+    //std::cout << "Rank: " << matrix_rank(mat) << std::endl;
+    std::cout << "Matrix params: " << mat.get_n() << " | " << mat.get_m() << std::endl;
+    std::cout << "b: " << b.size() << std::endl;
+    std::cout << "Func: " << obj.size() << std::endl;
+    Simplex simplex(mat, linear.get_b(), linear.get_obj_func(), TT::TT_MIN);
     std::vector<double> optimal = simplex.answer_func();
     std::vector<double> opt = linear.back_to_original_vars(optimal);
     // std::vector<double> optimal = linear.solve_task();
     double sum = 0;
-    size_t sum_int = 0;
+    double sum_int = 0;
     for (auto elem : opt) {
-        std::cout << "Elem: " << elem << std::endl;
+        //std::cout << "Elem: " << elem << std::endl;
         sum += elem;
         sum_int += std::ceil(elem);
-    }
-    std::cout << "Answer: " << sum << " | " << sum_int << std::endl;
+    }*/
+    // std::cout << "Answer: " << sum << " | " << sum_int << std::endl;
+
+    Task task(L, lengths, numbers_of_products);
+    auto answer = task.solve();
+
+    std::cout << "Answer: " << answer.first << " | " << answer.second << std::endl;
 
     return 0;
 }

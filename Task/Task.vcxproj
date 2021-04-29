@@ -23,11 +23,13 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Simplex.cpp" />
+    <ClCompile Include="Task.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Linear.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Simplex.h" />
+    <ClInclude Include="Task.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
