@@ -23,4 +23,5 @@ private:
 	size_t Num_Var(std::vector<double>&);
 	bool Check_Data();
 	void Positive_b();
+	void approximation();
 };

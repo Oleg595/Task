@@ -5,7 +5,6 @@
 Simplex::Simplex(Matrix& A, std::vector<double>& st, std::vector<double>& c, TT type_task) {
 	have_ans = true;
 	std::vector<double> b = A.gauss(st);
-	A.print();
 	for (size_t i = 0; i < A.get_n(); i++) {
 		std::vector<double> time_vector;
 		time_vector.push_back(b[i]);
@@ -28,6 +27,7 @@ Simplex::Simplex(Matrix& A, std::vector<double>& st, std::vector<double>& c, TT 
 	for (; i < A.get_m(); i++) {
 		func.push_back(0.);
 	}
+	approximation();
 	size_t max = 0;
 	size_t count = 0;
 	while (((max = Check()) != func.size()) && (Check_Data())) {
@@ -62,6 +62,7 @@ Simplex::Simplex(Matrix& A, std::vector<double>& st, std::vector<double>& c, TT 
 				return;
 			count = 0;
 		}
+		approximation();
 	}
 	if (type_task == TT_MAX) {
 		for (size_t i = 0; i < func.size(); i++) {
@@ -107,13 +108,16 @@ void Simplex::Positive_b() {
 	if (pos == -1)
 		return;
 	for (size_t i = pos + 1; i < data.size(); i++) {
-		if ((data[i].first[0] < -EPS) && (fabs(data[i].first[0]) > fabs(data[i].first[pos])))
+		if ((data[i].first[0] < -EPS) && (fabs(data[i].first[0]) > fabs(data[pos].first[0]))) {
 			pos = i;
+		}
 	}
 	int var = -1;
 	for (size_t i = 1; i < data[pos].first.size(); i++) {
-		if ((data[pos].first[i] < -EPS))
+		if ((data[pos].first[i] < -EPS)) {
 			var = i;
+			break;
+		}
 	}
 	if (var == -1) {
 		have_ans = false;
@@ -219,14 +223,19 @@ std::vector<double> Simplex::answer_func() {
 		for (size_t i = 0; i < data.size(); i++) {
 			ans[data[i].second] = data[i].first[0];
 		}
-		/*std::cout << "Answer Simplex" << std::endl;
-		for (size_t i = 0; i < ans.size(); i++) {
-			std::cout << ans[i] << " ";
-		}
-		std::cout << std::endl;*/
 		return ans;
 	}
 	else {
 		return std::vector<double>();
 	}
+}
+
+void Simplex::approximation() {
+	int sum = 0;
+	std::cout << std::endl;
+	for (size_t i = 0; i < data.size(); i++) {
+		sum += ceil(func[data[i].second] * data[i].first[0]);
+		std::cout << func[data[i].second] << " " << data[i].first[0] << " " << data[i].second << std::endl;
+	}
+	std::cout << sum << std::endl << std::endl;
 }

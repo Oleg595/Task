@@ -81,12 +81,10 @@ void Matrix::Change_Col(size_t i, size_t j) {
 }
 
 void Matrix::print() const {
-	/*for (size_t i = 0; i < n; ++i) {
 		for (size_t j = 0; j < m; ++j) {
-			std::cout << matrix[i][j] << ' ';
+			std::cout << matrix[0][j] << ' ';
 		}
 		std::cout << std::endl;
-	}*/
 }
 
 size_t Matrix::get_n() const {
